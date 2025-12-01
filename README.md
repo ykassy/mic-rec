@@ -23,44 +23,6 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
 
 *画像をクリックするとYouTubeで動画を再生できます（音声付き）*
 
-**動画の追加方法：**
-
-#### 方法1: YouTubeにアップロード（推奨・音声付き）
-
-1. **動画をYouTubeにアップロード**
-   - デモ動画をYouTubeにアップロード
-   - 公開設定: 公開または限定公開
-
-2. **READMEに埋め込み**
-   - YouTubeの動画IDを取得
-   - 上記の`YOUR_VIDEO_ID`を実際のIDに置き換え
-
-**例：**
-```html
-<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-```
-
-#### 方法2: 動画ファイルをリポジトリに追加
-
-1. **動画ファイルを配置**
-   - `docs/assets/demo.mp4` に配置
-   - ファイルサイズに注意（GitHubは100MBまで）
-
-2. **READMEにリンクを追加**
-   - 上記のコメントアウト部分を有効化
-   - ユーザーがクリックしてダウンロード・再生
-
-#### 方法3: GIFアニメーション（音声なし）
-
-音声が不要な場合は、GIFアニメーションも使用可能：
-
-![Demo GIF](./docs/assets/demo.gif)
-
-**GIF変換コマンド例（FFmpeg使用）：**
-```bash
-ffmpeg -i demo.mp4 -vf "fps=10,scale=800:-1:flags=lanczos" -c:v gif demo.gif
-```
-
 ### スクリーンショット
 
 <!-- スクリーンショットを追加する場合はここに配置 -->
@@ -105,7 +67,7 @@ npm run build
 ## 使用方法
 
 1. 開発サーバーを起動
-2. ブラウザで `https://localhost:9000` にアクセス
+2. ブラウザで `http://localhost:9000` にアクセス
 3. カメラ・マイクの許可を求められたら許可
 4. AR STARTボタンをクリックしてAR体験を開始
 5. 撮影ボタンで写真撮影、長押しで動画録画
