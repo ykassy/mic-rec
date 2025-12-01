@@ -8,6 +8,7 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
 - 🎥 **動画録画機能** - AR体験を動画として録画
 - 🎨 **Lens対応** - Snap Camera KitのLens（ARエフェクト）を表示
 - 📱 **レスポンシブ対応** - スマートフォン・タブレット・PCに対応
+- 🔄 **横向き（ランドスケープ）対応** - 画面の向きに応じてUIが自動調整
 - 🔊 **効果音** - 撮影・録画時に効果音を再生
 - 🎯 **マーカートラッキング対応** - マーカー検出に対応したLensに対応
 
@@ -22,6 +23,12 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
 [![Demo Video](https://img.youtube.com/vi/O7tQmNVwUL8/maxresdefault.jpg)](https://youtube.com/shorts/O7tQmNVwUL8)
 
 *画像をクリックするとYouTubeで動画を再生できます（音声付き）*
+
+### スクリーンショット
+
+横向き（ランドスケープ）表示の例：
+
+![Landscape Screenshot](./docs/assets/landscape-screenshot.png)
 
 ## クイックスタート
 
@@ -45,7 +52,9 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
    ```
 
 5. **ブラウザでアクセス**
-   - `http://localhost:9000` にアクセス
+   - `https://localhost:9001` にアクセス
+   - 初回アクセス時、ブラウザでセキュリティ警告が表示される場合があります
+   - 「詳細設定」→「localhost にアクセスする（安全ではない）」をクリック
 
 ## 技術スタック
 
@@ -83,7 +92,7 @@ npm install
 npm run serve
 ```
 
-開発サーバーは `http://localhost:9000` で起動します。
+開発サーバーは `https://localhost:9001` で起動します。
 
 ### 4. ビルド（本番用）
 
@@ -123,7 +132,9 @@ SnapCamerakitForWebUI/
    ```
 
 2. **ブラウザでアクセス**
-   - `http://localhost:9000` にアクセス
+   - `https://localhost:9001` にアクセス
+   - 初回アクセス時、ブラウザでセキュリティ警告が表示される場合があります
+   - 「詳細設定」→「localhost にアクセスする（安全ではない）」をクリック
 
 3. **権限の許可**
    - カメラ・マイクの許可を求められたら「許可」をクリック
@@ -139,6 +150,10 @@ SnapCamerakitForWebUI/
 6. **プレビュー・シェア**
    - 撮影後、プレビュー画面で確認
    - 「SHARE PHOTO」または「SHARE MOVIE」でシェア
+
+**横向き（ランドスケープ）対応：**
+- デバイスを横向きにすると、UIが自動的に調整されます
+- 縦向き・横向きの両方で快適に使用できます
 
 ## カスタマイズ
 
@@ -214,4 +229,14 @@ ISC
 ## 貢献
 
 プルリクエストやイシューの報告を歓迎します。
+
+## 作成者
+
+このプロジェクトは [HACK IT INC.](https://hackitinc.jp/) によって開発されました。
+
+**HACK IT INC.** は、ARコンテンツ・アートディレクションの企画・制作を行うプロデュースチームです。
+
+- 🌐 [公式サイト](https://hackitinc.jp/)
+- 📧 ARを通じて企業の本質や世界観を「体験」として繋げるプロデュースを提供
+- 🎨 WebAR、TikTok AR、地理情報AR、メディアアートなど、最新技術とビジュアルデザインを組み合わせたAR体験を制作
 
