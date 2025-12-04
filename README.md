@@ -30,7 +30,16 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
 
 ![Landscape Screenshot](./docs/assets/landscape-screenshot.png)
 
-## クイックスタート
+## セットアップ
+
+### 前提条件
+
+- **Node.js** v14以上
+- **npm** または **yarn**
+- **Snap Camera Kit API Token** - [Camera Kit管理画面](https://camera-kit.snapchat.com/)から取得
+- **Lens ID / Group ID** - Lens Studioで公開したLensの情報から取得
+
+### 手順
 
 1. **リポジトリをクローン**
    ```bash
@@ -43,18 +52,70 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
    npm install
    ```
 
-3. **設定ファイルを編集**
-   - `src/settings.js` を開いて、API TokenとLens IDを設定
+3. **設定ファイルを編集** ⚠️ **必須**
+   
+   `src/settings.js` を開いて、以下を設定してください：
+   ```javascript
+   apiToken: "YOUR_API_TOKEN_HERE",  // Camera Kit管理画面から取得
+   lensID:  "YOUR_LENS_ID_HERE",     // Lens Studioで公開したLensのID
+   groupID: "YOUR_GROUP_ID_HERE",    // LensのGroup ID
+   ```
+   
+   **取得方法（動画解説）：**
+   
+   **📹 [YouTubeで取得方法の動画を見る](https://youtu.be/a4JH94_fe6I)**
+   
+   [![Token and ID Setup Tutorial](https://img.youtube.com/vi/a4JH94_fe6I/maxresdefault.jpg)](https://youtu.be/a4JH94_fe6I)
+   
+   *画像をクリックするとYouTubeで動画を再生できます*
+   
+   - **API Token**: [Camera Kit管理画面](https://camera-kit.snapchat.com/)から取得
+   - **Lens ID / Group ID**: Lens Studioで公開したLensの情報から取得
 
 4. **開発サーバーを起動**
    ```bash
    npm run serve
    ```
+   
+   ブラウザで開発サーバーのアドレスにアクセスし、カメラ・マイクの許可を求められたら「許可」をクリックして、「AR START !!」ボタンをクリックしてAR体験を開始してください。
 
-5. **ブラウザでアクセス**
-   - `https://localhost:9001` にアクセス
-   - 初回アクセス時、ブラウザでセキュリティ警告が表示される場合があります
-   - 「詳細設定」→「localhost にアクセスする（安全ではない）」をクリック
+### 使用方法
+
+- **写真撮影**: 撮影ボタンをタップ
+- **動画録画**: 撮影ボタンを長押し（0.3秒以上）
+- **カメラ切り替え**: 右上のカメラ切り替えボタンをクリック
+- **プレビュー・シェア**: 撮影後、プレビュー画面で確認し、「SHARE PHOTO」または「SHARE MOVIE」でシェア
+
+**横向き（ランドスケープ）対応：**
+デバイスを横向きにすると、UIが自動的に調整されます。縦向き・横向きの両方で快適に使用できます。
+
+### ビルドとデプロイ（本番用）
+
+```bash
+npm run build
+```
+
+ビルドされたファイルは `docs/` ディレクトリに出力されます。
+
+**サーバーへのデプロイ：**
+`docs/` ディレクトリ内のすべてのファイルを、Webサーバーの公開ディレクトリにアップロードしてください。HTTPS環境で動作する必要があります。
+
+### Remote API（オプション）
+
+マーカー検出時のリダイレクト機能を使用する場合：
+
+1. **Lens Studio側で設定** ⚠️ **必須**
+   - Lens StudioでRemote APIのエンドポイントを設定する必要があります
+   - 詳細は[Lens Studioのドキュメント](https://docs.snap.com/lens-studio/)を参照してください
+
+2. **`src/settings.js` で設定**
+   ```javascript
+   remoteAPISpecId: "YOUR_REMOTE_API_SPEC_ID_HERE",  // Snap管理画面から取得
+   redirectUrl: "https://example.com/",              // リダイレクト先URL
+   useRemoteAPI: true,                                // Remote APIを有効化
+   ```
+
+使用しない場合は `useRemoteAPI: false` のまま。
 
 ## 技術スタック
 
@@ -62,45 +123,6 @@ Snap Camera Kit for Webを使用したAR体験アプリケーションです。�
 - **Webpack** - ビルドツール
 - **Vanilla JavaScript** - フレームワークなしのシンプルな実装
 - **CSS3** - モダンなUIデザイン
-
-## 前提条件
-
-- **Node.js** v14以上
-- **npm** または **yarn**
-- **Snap Camera Kit API Token** - [Camera Kit管理画面](https://camera-kit.snapchat.com/)から取得
-- **Lens ID** - Lens Studioで公開したLensのID
-
-## セットアップ
-
-### 1. 依存関係のインストール
-
-```bash
-npm install
-```
-
-### 2. 設定ファイルの編集
-
-`src/settings.js` を開いて、以下を設定してください：
-
-- `apiToken` - Snap Camera KitのAPI Token
-- `lensID` - 使用するLensのID
-- `groupID` - LensのGroup ID
-
-### 3. 開発サーバーの起動
-
-```bash
-npm run serve
-```
-
-開発サーバーは `https://localhost:9001` で起動します。
-
-### 4. ビルド（本番用）
-
-```bash
-npm run build
-```
-
-ビルドされたファイルは `docs/` ディレクトリに出力されます。
 
 ## プロジェクト構成
 
@@ -124,68 +146,6 @@ SnapCamerakitForWebUI/
 - `src/main.js` - Camera Kitの初期化、カメラ制御、撮影機能
 - `src/remoteAPI.js` - Remote API機能（`useRemoteAPI: true` の場合のみ使用）
 
-## 使用方法
-
-1. **開発サーバーを起動**
-   ```bash
-   npm run serve
-   ```
-
-2. **ブラウザでアクセス**
-   - `https://localhost:9001` にアクセス
-   - 初回アクセス時、ブラウザでセキュリティ警告が表示される場合があります
-   - 「詳細設定」→「localhost にアクセスする（安全ではない）」をクリック
-
-3. **権限の許可**
-   - カメラ・マイクの許可を求められたら「許可」をクリック
-
-4. **AR体験を開始**
-   - 「AR START !!」ボタンをクリック
-
-5. **撮影・録画**
-   - **写真撮影**: 撮影ボタンをタップ
-   - **動画録画**: 撮影ボタンを長押し（0.3秒以上）
-   - **カメラ切り替え**: 右上のカメラ切り替えボタンをクリック
-
-6. **プレビュー・シェア**
-   - 撮影後、プレビュー画面で確認
-   - 「SHARE PHOTO」または「SHARE MOVIE」でシェア
-
-**横向き（ランドスケープ）対応：**
-- デバイスを横向きにすると、UIが自動的に調整されます
-- 縦向き・横向きの両方で快適に使用できます
-
-## カスタマイズ
-
-### 必須設定
-
-`src/settings.js` で以下を設定してください：
-
-```javascript
-apiToken: "YOUR_API_TOKEN_HERE",  // Camera Kit管理画面から取得
-lensID:  "YOUR_LENS_ID_HERE",     // Lens Studioで公開したLensのID
-groupID: "YOUR_GROUP_ID_HERE",    // LensのGroup ID
-```
-
-**取得方法：**
-- **API Token**: [Camera Kit管理画面](https://camera-kit.snapchat.com/)から取得
-- **Lens ID / Group ID**: Lens Studioで公開したLensの情報から取得
-
-### Remote API（オプション）
-
-マーカー検出時のリダイレクト機能を使用する場合：
-
-```javascript
-remoteAPISpecId: "YOUR_REMOTE_API_SPEC_ID_HERE",  // Snap管理画面から取得
-redirectUrl: "https://example.com/",              // リダイレクト先URL
-useRemoteAPI: true,                                // Remote APIを有効化
-```
-
-**Remote APIについて：**
-- マーカー検出などのイベントをサーバー側で処理できます
-- マーカー検出時に指定URLにリダイレクトする機能が実装済み
-- 使用しない場合は `useRemoteAPI: false` のまま
-
 
 ## ブラウザ対応
 
@@ -208,9 +168,6 @@ ISC
 🔒 **セキュリティ**
 - カメラ・マイクの許可が必要です
 - HTTPS環境またはlocalhostでのみ動作します
-
-📝 **その他**
-- Remote APIを使用する場合は、`useRemoteAPI: true` に設定し、`remoteAPISpecId` を設定してください
 
 ## トラブルシューティング
 
