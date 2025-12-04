@@ -417,6 +417,7 @@
 
 .camera-switcher-btn-wrapper.active {
     display: flex; /* AR START後に表示 */
+    pointer-events: auto; /* ボタンをクリック可能にする */
 }
 
 .camera-switcher-btn-wrapper.preview {

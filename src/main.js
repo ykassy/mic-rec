@@ -243,9 +243,24 @@ async function initCameraKit() {
       modal.classList.remove('hidden');
     }
     
+    // モーダルボタンのセットアップ（確実に実行）
+    setupModalHandler();
+    
   } catch (error) {
-    console.error('[initCameraKit] エラー:', error);
-    throw error;
+    // エラーが発生してもモーダルは表示する
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.classList.add('hidden');
+    }
+    
+    const modal = document.getElementById('audio-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+    
+    // モーダルボタンのセットアップ（エラー時も実行）
+    setupModalHandler();
+    // エラーを再スローしない（モーダルを表示して続行）
   }
 }
 
@@ -326,31 +341,80 @@ if (document.readyState === 'loading') {
 // ===== カメラ更新 =====
 async function updateCamera(switchCamera = false) {
   try {
+    if (!window.session) {
+      throw new Error('window.sessionが存在しません。Camera Kitが初期化されていません。');
+    }
+    
     // カメラ切り替え時のみ反転
     if (switchCamera) {
       isBackFacing = !isBackFacing;
     }
 
     if (window.mediaStream) {
-      window.session.pause();
-      window.mediaStream.getTracks().forEach(track => track.stop());
+      try {
+        if (window.session && window.session.state !== 'paused') {
+          await window.session.pause();
+        }
+      } catch (pauseError) {
+        // エラーを無視して続行
+      }
+      window.mediaStream.getTracks().forEach(track => {
+        try {
+          track.stop();
+          track.enabled = false;
+        } catch (trackError) {
+          // エラーを無視して続行
+        }
+      });
+      window.mediaStream = null;
+      // カメラの完全な停止を待つ
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     // カメラ許可のみ取得（マイクは不要）
-    window.mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        facingMode: isBackFacing ? 'environment' : 'user',
-      },
-    });
+    const facingMode = isBackFacing ? 'environment' : 'user';
+    const cameraType = isBackFacing ? 'back' : 'front';
+    
+    try {
+      const getUserMediaPromise = navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: facingMode,
+        },
+      });
+      
+      // タイムアウトを設定（10秒）
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('getUserMediaがタイムアウトしました（10秒）')), 10000)
+      );
+      
+      window.mediaStream = await Promise.race([getUserMediaPromise, timeoutPromise]);
+    } catch (getUserMediaError) {
+      throw new Error('カメラへのアクセスが拒否されました: ' + getUserMediaError.message);
+    }
 
     const source = createMediaStreamSource(window.mediaStream, {
-      cameraType: isBackFacing ? 'back' : 'front',
+      cameraType: cameraType,
     });
 
-    await window.session.setSource(source);
+    // 既存のソースをクリア
+    if (window.session.source) {
+      try {
+        await window.session.setSource(null);
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch (clearError) {
+        // エラーを無視して続行
+      }
+    }
 
+    try {
+      await window.session.setSource(source);
+    } catch (setSourceError) {
+      throw new Error('ソースの設定に失敗しました: ' + setSourceError.message);
+    }
+
+    // フロントカメラの場合はミラーリング、背面カメラの場合は通常表示
     if (!isBackFacing) {
       source.setTransform(Transform2D.MirrorX);
     }
@@ -368,19 +432,25 @@ async function updateCamera(switchCamera = false) {
       await window.session.applyLens(currentLens);
     }
 
-    await window.session.play();
+    try {
+      await window.session.play();
+    } catch (playError) {
+      // play()のエラーは無視して続行
+    }
     
   } catch (error) {
-    console.error('⚠️ [Camera] エラー:', error);
     throw error;
   }
 }
 
 // ===== カメラ切り替えボタン =====
+let cameraSwitcherSetup = false; // セットアップ済みフラグ
 function setupCameraSwitcher() {
+  if (cameraSwitcherSetup) return; // 既にセットアップ済みの場合はスキップ
   const cameraSwitchBtn = document.getElementById("camera-switcher");
   if (cameraSwitchBtn) {
     cameraSwitchBtn.addEventListener("click", () => updateCamera(true)); // カメラ切り替え
+    cameraSwitcherSetup = true;
   }
 }
 

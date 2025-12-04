@@ -26,7 +26,7 @@ module.exports = {
       overlay: false
     },
     compress: true,
-    port: 9001,
+    port: 9002,
     allowedHosts: 'all', // すべてのホストを許可
     server: 'https', // HTTPSを有効化
   },
