@@ -9,7 +9,7 @@ import { Settings } from './settings';
 import { bootstrapCameraKitWithRemoteAPI } from './remoteAPI';
 
 let cameraKit;
-let isBackFacing = true; // マーカートラッキングのため背面カメラから開始
+let isBackFacing = false; // インカメラから開始
 let currentLens;
 let globalAudioContext = null;
 let soundEffectAudioContext = null; // 効果音専用のAudioContext
@@ -295,7 +295,16 @@ function setupModalHandler() {
       
       // 効果音用のAudioContextを初期化（ユーザーインタラクション内）
       initSoundEffectAudioContext();
-      
+
+      // マイク許可を事前に取得（録画時にスムーズに開始できるように）
+      try {
+        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // 許可取得後、トラックを停止（録画時に再度取得する）
+        micStream.getAudioTracks().forEach(track => track.stop());
+      } catch (micError) {
+        console.warn('マイク許可の取得に失敗しました:', micError);
+      }
+
       // カメラ起動
       await updateCamera();
       setupCameraSwitcher();

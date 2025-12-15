@@ -140,7 +140,13 @@ function stopRecording() {
     if (window.playRecordStopSound) {
         window.playRecordStopSound();
     }
-    
+
+    // マイクトラックを停止
+    if (window.recordingAudioTrack) {
+        window.recordingAudioTrack.stop();
+        window.recordingAudioTrack = null;
+    }
+
     mediaRecorder.stop();
     countStop();
     movieBlob = new Blob(window.recordingChunks, { type: 'video/mp4' });
@@ -164,18 +170,18 @@ function stopRecording() {
 /**
  * レコーディングのスタート
  */
-function recordingVideo() {
+async function recordingVideo() {
     // 動画録画開始音を再生
     if (window.playRecordStartSound) {
         window.playRecordStartSound();
     }
-    
+
     recordingFlg = true;
     recordingStartTime = Date.now(); // 録画開始時刻を記録
     cameraSwitchBtnWrapperEvent(true);
     const captureBtnInner = document.querySelector(".capture-btn-inner");
     captureBtnInner.classList.add("rec-start");
-    
+
     // 録画開始時にボタン押下アニメーションを追加
     const captureBtn = document.getElementById("capture-btn");
     captureBtn.classList.add("btn-pressed");
@@ -195,8 +201,28 @@ function recordingVideo() {
     const os = getOSType();
     const mimeType = os === "ios" || os === "ipados" ? "video/mp4" : "video/webm";
 
+    // 映像ストリームを取得
     const videoStream = liveRenderTarget.captureStream(30);
-    mediaRecorder = new MediaRecorder(videoStream, { mimeType });
+
+    // マイク音声を取得して映像と合成
+    let combinedStream = videoStream;
+    try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioTrack = audioStream.getAudioTracks()[0];
+        if (audioTrack) {
+            combinedStream = new MediaStream([
+                ...videoStream.getVideoTracks(),
+                audioTrack
+            ]);
+            // 録画停止時にマイクトラックも停止するために保存
+            window.recordingAudioTrack = audioTrack;
+        }
+    } catch (audioError) {
+        console.warn('マイク音声の取得に失敗しました:', audioError);
+        // マイクが使用できない場合は映像のみで録画続行
+    }
+
+    mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
     window.recordingChunks = [];
     mediaRecorder.addEventListener('dataavailable', (event) => {
         window.recordingChunks.push(event.data)
